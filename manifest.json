@@ -1,8 +1,8 @@
 {
-  "name": "YouTube Summary with ChatGPT",
-  "version": "1.0.4",
+  "name": "YouTube Summary with Gemini", // 名前を変更 (例)
+  "version": "1.0.0",
   "manifest_version": 3,
-  "description": "Use ChatGPT to summarize YouTube videos",
+  "description": "Use Gemini to summarize YouTube videos",
   "background": {
     "service_worker": "background.bundle.js",
     "type": "module"
@@ -14,7 +14,7 @@
   },
   "content_scripts": [
     {
-      "matches": ["https://www.youtube.com/*", "https://chat.openai.com/*"],
+      "matches": ["https://www.youtube.com/*", "https://aistudio.google.com/prompts/new_chat*"],
       "js": ["contentscript/index.bundle.js"],
       "css": ["contentscript/yt_ai_summary.css"],
       "all_frames": false

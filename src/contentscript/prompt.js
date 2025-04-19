@@ -1,83 +1,57 @@
-export function getSummaryPrompt(transcript) {
-  return `Title: "${document.title
-    .replace(/\n+/g, " ")
-    .trim()}"\nVideo Transcript: "${truncateTranscript(transcript)
-    .replace(/\n+/g, " ")
-    .trim()}"\nVideo Summary:`;
+// HH:MM:SS形式に変換するヘルパー関数
+function formatTime(seconds) {
+    const date = new Date(0);
+    // parseFloatで秒数を数値に変換し、無効な場合は0をデフォルト値とする
+    date.setSeconds(parseFloat(seconds || 0));
+    // getUTCHours, getUTCMinutes, getUTCSecondsを使ってHH:MM:SSを生成
+    const hours = String(date.getUTCHours()).padStart(2, '0');
+    const minutes = String(date.getUTCMinutes()).padStart(2, '0');
+    const secondsFormatted = String(date.getUTCSeconds()).padStart(2, '0');
+    // 1時間未満でもHHを含める
+    return `${hours}:${minutes}:${secondsFormatted}`;
 }
 
-// Seems like 15,000 bytes is the limit for the prompt
-const limit = 14000; // 1000 is a buffer
+// 新しいプロンプト生成関数
+export function getSummaryPrompt(rawTranscript) {
+    let title = "Could not find title"; // デフォルト値
+    // ★★★ セレクタを更新 ★★★
+    const titleElement = document.querySelector('ytd-watch-metadata div#title h1 yt-formatted-string');
+
+    if (titleElement && titleElement.textContent) {
+        title = titleElement.textContent.replace(/\n+/g, " ").trim();
+    } else {
+        // もし上記セレクタで見つからない場合のフォールバックとしてdocument.titleを使う
+        console.warn("Could not find title element using specific selector, falling back to document.title");
+        // 簡単な通知数除去処理 (改良版)
+        title = document.title.replace(/^\(\d+\)\s*/, '').replace(/\n+/g, " ").trim();
+    }
+
+    // タイムスタンプ付きトランスクリプトを生成
+    const transcriptWithTimestamps = rawTranscript
+        .filter(item => item.text && item.text.trim() !== '')
+        .map(item => `(${formatTime(item.start)}) ${item.text.replace(/\n+/g, " ").trim()}`) // 括弧付きを推奨
+        // .map(item => `${formatTime(item.start)} ${item.text.replace(/\n+/g, " ").trim()}`) // 括弧なしを試す場合
+        .join('\n');
+
+    // ★★★ Markdown形式のプロンプト ★★★
+    const taskDescription = "要約しろ。話題毎のタイムスタンプを作れ。日本語で答えろ。";
+
+    return `# Task\n${taskDescription}\n\n# YouTubeTitle\n${title}\n\n# TranscriptWithTimestamps\n${transcriptWithTimestamps}`;
+}
+
+// 不要になった関数を削除またはコメントアウト
+/*
+const limit = 14000;
 
 export function getChunckedTranscripts(textData, textDataOriginal) {
-
-  // [Thought Process]
-  // (1) If text is longer than limit, then split it into chunks (even numbered chunks) 
-  // (2) Repeat until it's under limit
-  // (3) Then, try to fill the remaining space with some text 
-  // (eg. 15,000 => 7,500 is too much chuncked, so fill the rest with some text)
-
-  let result = "";
-  const text = textData.sort((a, b) => a.index - b.index).map(t => t.text).join(" ");
-  const bytes = textToBinaryString(text).length;
-
-  if (bytes > limit) {
-    // Get only even numbered chunks from textArr
-    const evenTextData = textData.filter((t, i) => i % 2 === 0);
-    result = getChunckedTranscripts(evenTextData, textDataOriginal);
-  } else {
-    // Check if any array items can be added to result to make it under limit but really close to it
-    if (textDataOriginal.length !== textData.length) {
-      textDataOriginal.forEach((obj, i) => {
-        
-        if (textData.some(t => t.text === obj.text)) { return; }
-        
-        textData.push(obj);
-        
-        const newText = textData.sort((a, b) => a.index - b.index).map(t => t.text).join(" ");
-        const newBytes = textToBinaryString(newText).length;
-        
-        if (newBytes < limit) {
-
-          const nextText = textDataOriginal[i + 1];
-          const nextTextBytes = textToBinaryString(nextText.text).length;
-
-          if (newBytes + nextTextBytes > limit) {
-            const overRate = ((newBytes + nextTextBytes) - limit) / nextTextBytes;
-            const chunkedText = nextText.text.substring(0, Math.floor(nextText.text.length * overRate));
-            textData.push({ text: chunkedText, index: nextText.index });
-            result = textData.sort((a, b) => a.index - b.index).map(t => t.text).join(" ");
-          } else {
-            result = newText;
-          }
-        }
-
-      })
-    } else {
-      result = text;
-    }
-  }
-
-  const originalText = textDataOriginal.sort((a, b) => a.index - b.index).map(t => t.text).join(" ");
-  return (result == "") ? originalText : result; // Just in case the result is empty
-  
+  // ... (省略) ...
 }
 
 function truncateTranscript(str) {
-  const bytes = textToBinaryString(str).length;
-  if (bytes > limit) {
-    const ratio = limit / bytes;
-    const newStr = str.substring(0, str.length * ratio);
-    return newStr;
-  }
-  return str;
+  // ... (省略) ...
 }
 
 function textToBinaryString(str) {
-  let escstr = decodeURIComponent(encodeURIComponent(escape(str)));
-  let binstr = escstr.replace(/%([0-9A-F]{2})/gi, function (match, hex) {
-    let i = parseInt(hex, 16);
-    return String.fromCharCode(i);
-  });
-  return binstr;
+  // ... (省略) ...
 }
+*/

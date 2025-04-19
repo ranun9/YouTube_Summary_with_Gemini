@@ -1,7 +1,7 @@
 {
-  "name": "youtube_summary_with_chatgpt",
+  "name": "youtube_summary_with_gemini",
   "version": "1.0.0",
-  "description": "YouTube Summary with ChatGPT",
+  "description": "YouTube Summary with Gemini",
   "main": "background.js",
   "scripts": {
     "clean": "rimraf dist/*",
@@ -14,7 +14,7 @@
     "url": "git+https://github.com/kazuki-sf/youtube_summary.git"
   },
   "author": "",
-  "license": "UNLICENSED",
+  "license": "MIT",
   "bugs": {
     "url": "https://github.com/kazuki-sf/youtube_summary/issues"
   },
