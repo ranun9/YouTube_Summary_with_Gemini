@@ -11,14 +11,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/kazuki-sf/youtube_summary.git"
+    "url": "git+https://github.com/ranun9/YouTube_Summary_with_Gemini.git"
   },
   "author": "",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/kazuki-sf/youtube_summary/issues"
+    "url": "https://github.com/ranun9/YouTube_Summary_with_Gemini/issues"
   },
-  "homepage": "https://github.com/kazuki-sf/youtube_summary#readme",
+  "homepage": "https://github.com/ranun9/YouTube_Summary_with_Gemini",
   "devDependencies": {
     "copy-webpack-plugin": "^9.0.1",
     "css-loader": "^6.4.0",
